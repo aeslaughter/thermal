@@ -1,0 +1,58 @@
+% PREAMBLE TO DOCUMENT
+\documentclass[10pt,twoside,titlepage]{article}		% Type of document
+\usepackage{slaughter}								% Use standard Slaughter package
+\usepackage{listings}
+\usepackage{placeins}
+\usepackage{geometry}
+
+%Set document headers
+\usepackage{fancyhdr}						
+\pagestyle{fancy}
+\cfoot{\bfseries\thepage}
+\lhead{\bfseries Thermal Model Software}
+\rhead{\nouppercase{\leftmark}}
+
+\newenvironment{singlespaced}[0]{}{}
+\newenvironment{singlespace}[0]{}{}
+
+%Biblography setup
+\usepackage[sectionbib]{natbib}			% Author-Date system
+\usepackage{chapterbib}					% Allows multiple bibliographies
+
+%Use hyperlinks
+\usepackage[pdftex]{hyperref}				
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}	
+\usepackage{bookmark}
+
+\title{Thermal Model Software}
+\author{Andrew E. Slaughter\\Montana State University\\Department of Civil Engineering\\Subzero Science and Engineering Research Facility}
+
+\definecolor{darkgreen}{rgb}{0,0.4,0}
+\lstdefinestyle{inline}{frame=lines, xleftmargin=0pt, numbers=none, basicstyle=\scriptsize}
+\lstdefinestyle{figure}{numbers=left, frame=shadowbox, numberstyle={\tiny} ,numbersep=5pt, xleftmargin=2.5em, language=Matlab, basicstyle=\scriptsize, stringstyle=\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{darkgreen}, breaklines=true, breakatwhitespace=false} 
+\lstdefinestyle{file}{numbers=left, frame=single, numberstyle={\tiny} ,numbersep=5pt, xleftmargin=2.5em, language=Matlab, basicstyle=\tiny, stringstyle=\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{darkgreen}, breaklines=true, breakatwhitespace=false} 
+
+\newcommand{\secref}[1]{\ref{#1}} 
+\newcommand{\software}{C:/Users/pigpen/Documents/MSUResearch/MATLABcode/ThermalModel_v5/}
+\newcommand{\source}[2]
+{
+\subsection{\texttt{#1}}\label{src:#2}
+\begin{singlespaced}
+\lstinputlisting[style=file]{\software #2}
+\end{singlespaced}
+}
+
+\begin{document}
+\maketitle\clearpage
+\pagenumbering{roman}
+\tableofcontents\clearpage
+\listoftables
+\listoffigures\clearpage
+
+\pagenumbering{arabic}
+\input{ThermalSoftware.tex}
+\clearpage
+\renewcommand{\bibsection}{\section{References}}
+\bibliographystyle{ametsoc} 
+\bibliography{research}
+\end{document}
