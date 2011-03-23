@@ -107,9 +107,9 @@ function callback_graph(hObject,eventdata)
     flx = get(h.flux,'Value'); idx = flx ~= 1; flx = flx(idx)-1;
     for i = 1:length(flx); 
         if profile == 1
-            results('flux',data,flx(i),Tint,ci); title(data.name);
+            results('flux',data,flx(i),Tint,ci);;
         elseif profile == 0;
-            results('fluxcontour',data,flx(i),ci); title(data.name); 
+            results('fluxcontour',data,flx(i),ci);;
         end
     end
     
@@ -118,9 +118,9 @@ function callback_graph(hObject,eventdata)
     opt = {'T','TG'};
     for i = 1:length(tmp); 
         if profile == 1
-            results(opt{tmp(i)},data,Tint,ci); title(data.name); 
+            results(opt{tmp(i)},data,Tint,ci);;
         elseif profile == 0;
-            results([opt{tmp(i)},'contour'],data,ci); title(data.name);
+            results([opt{tmp(i)},'contour'],data,ci);;
         end
     end
     

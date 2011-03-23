@@ -74,7 +74,8 @@ end
 
 % 2 - PRODUCE GRAPH
     if isempty(x); return; end
-    XYscatter(x,y,'advanced',a,'interpreter','latex');
+    a.name = data.name;
+    XYscatter(x,y,'advanced',a,'interpreter','latex','prompt','off');
        
 %--------------------------------------------------------------------------
 function [X,Y] = getlabel(type,N)
@@ -228,9 +229,10 @@ function [x,y,a] = fluxplot(data,varargin)
 % 2 - Case when latent, sensible, long-wave (only at surface, no profile) 
     if N <= 3;
         y = data.Q(1,:,N)'; 
-        x = data.snw(:,1); 
+        x = (1:size(data.Q,2))'/dt;
         a.ylabel = getlabel('flux',N);
         a.xlabel = 'Time ($hr$)';
+        a.legend = {};
         
 % 3 - Case when short-wave (builds profiles)        
     elseif N > 3
