@@ -4,7 +4,7 @@ This manual is divided into three main sections.  Section \ref{TM:sec:basic} exp
 A few notational conventions are utilized throughout this user manual:
 \begin{itemize}
 \item Monospaced typeface indicates a MATLAB m-file, function, or variable (e.g., \texttt{sobol.m}).
-\item MATLAB code is provided in figure windows (e.g., Figure \ref{SA:fig:fang} when referenced many times).
+\item MATLAB code is provided in figure windows.
 \item MATLAB code is also presented in-line with the text as:
 \begin{singlespaced}\begin{lstlisting}[style=inline]
 >> 2+2
@@ -59,7 +59,7 @@ Once the three input variable arrays are defined the thermal model may be execut
 >> [T,Q] = thermal(S, A, constants); 
 \end{lstlisting}\end{singlespaced}
 
-The \texttt{thermal.m} function implements the finite-difference solution presented in Chapter \ref{chapter5}.  This function outputs an array containing snow temperatures (\texttt{T}) as a function of model evaluation time (columns) and depth (rows).  The various heat-fluxes---long-wave, sensible, latent, short-wave---are output in the \texttt{Q} variable in similar fashion.
+The \texttt{thermal.m} function implements a finite-difference solutio  that outputs an array containing snow temperatures (\texttt{T}) as a function of model evaluation time (columns) and depth (rows).  The various heat-fluxes---long-wave, sensible, latent, short-wave---are output in the \texttt{Q} variable in similar fashion.
 
 \section{Spreadsheet Application}\label{TM:sec:spread}
 \subsection{General Application}
@@ -115,8 +115,19 @@ data =
 \label{TM:fig:runmodel}
 \end{figure}
 
+\FloatBarrier
 \subsection{Additional Features}\label{TM:sec:features}
 The usage of the function \texttt{xls\_input.m} offers additional functionality for inputs, including the usage of tabulated snow micro-structure data, input multipliers, and confidence interval calculations.
+
+\subsubsection{Time Dependant Snow Properties}
+The snow properties are generally a function of depth and remain constant throughout the duration of the model evaluation. However, it is possible to set the thermal conductivity and the extinction coefficients as function of time. This is accomplished by entering a valid MATLAB equation, as a function of \texttt{t}, as shown in Figure \ref{fig:timefunc}. The equation must be in a format such that MATLAB's \texttt{eval} function may be used; \texttt{t} must be expressed in hours.
+
+\begin{figure}[b!]\centering
+\includegraphics[width=\linewidth]{figures/timefunc.png}
+\caption{Example of using a time function for a snow property.}
+\label{fig:timefunc}
+\end{figure}
+
 
 \subsubsection{Snow Micro-Structure} The snow albedo and extinction coefficient may be input into the Excel document using keys: \emph{dXX}, \emph{classX}, or \emph{type}.\footnote{The \emph{italicized} keys are used to reference the inputs, the actual text as would be entered in the Excel worksheets is provide in quotes.}  The \emph{dXX} key allows the snow grain diameter to be used to compute albedo and extinction coefficient according to \citet[Eq. 2.25, p. 56]{armstrong2008}, were the \emph{XX} is a number representing the size of the grain in millimeters (e.g., \q{d5}).  Figure \ref{TM:fig:snowatm}b includes the implementation of this option. The \emph{classX} key uses the tabulated values from \citet[Tab. 2.6]{armstrong2008}, where \emph{X} is a value one to six (e.g., \q{class2}).  The type may be one of three strings: ``fine'', ``medium'', or ``coarse'', this option is only available for the computation of albedo.  The usage of these keys results in the computation of the albedo from the information provided in \citet{baldridge2009}.  The albedo and extinction coefficient calculations are preformed in the \texttt{albedo} and \texttt{extinction} sub-functions of \texttt{xls\_input.m}.
 
@@ -172,13 +183,13 @@ The following briefly describes the basic steps of performing thermal model eval
 \end{enumerate}
 
 \subsection{Graphing Results}
-It is possible to create graphs of both the model inputs and outputs, this is done using the lower pane of the GUI shown in Figure \ref{TM:fig:gui}.  First, a model run must be selected in the Project Run(s) panel.  The graphs created share all of the functionallity of the graphs presented in Appendix \ref{apx:YCweather} (Section \secref{YC:sec:graphs}).
+It is possible to create graphs of both the model inputs and outputs, this is done using the lower pane of the GUI shown in Figure \ref{TM:fig:gui}.  First, a model run must be selected in the Project Run(s) panel.
 
 \subsubsection{Model Inputs}
 The model inputs are graphed by selecting the Plot Input(s) radio button, this will cause the Snow and Atmospheric parameter lists to become activated. To create a graph simply select the desired item and press the Plot Results button. A graph will appear for each item selected. 
 
 \subsubsection{Model Outputs}
-Two different graph styles of model outputs are available: profiles and coutours.  Figure \ref{TM:fig:example} provides examples of the snowpack temperature graphed with each of the different methods.  When ploting profiles the interval, in hours, must also be set (e.g., 2 results in profiles being plotted every 2 hours). It is possible to graph a single profile directly from a contour plot, this is done be right-clicking on the contour where the profile is desired and the selecting either a vertical or horizontal profile. 
+Two different graph styles of model outputs are available: profiles and contours.  Figure \ref{TM:fig:example} provides examples of the snowpack temperature graphed with each of the different methods.  When plotting profiles the interval, in hours, must also be set (e.g., 2 results in profiles being plotted every 2 hours). It is possible to graph a single profile directly from a contour plot, this is done be right-clicking on the contour where the profile is desired and the selecting either a vertical or horizontal profile. 
 
 \begin{figure}[ht!]\centering
 \subfloat[Temperature Profiles]{\includegraphics[width=0.47\linewidth]{figures/profiles.pdf}}\quad
@@ -198,6 +209,10 @@ In similar fashion, if confidence intervals were computed it is possible to grap
 
 \section{Closing Remarks}
 The information presented here explains the basic and advanced functionality of the thermal model developed. The details presented as well as the entire software package was developed to make the model easily accessible, thus please contact the author if more information is required.
+
+\renewcommand{\bibsection}{\section{References}}
+\bibliographystyle{ametsoc} 
+\bibliography{research}
 
 \clearpage
 \section{Source Code}\label{TM:sec:source}

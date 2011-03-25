@@ -16,8 +16,7 @@
 \newenvironment{singlespace}[0]{}{}
 
 %Biblography setup
-\usepackage[sectionbib]{natbib}			% Author-Date system
-\usepackage{chapterbib}					% Allows multiple bibliographies
+\usepackage{ natbib}			% Author-Date system
 
 %Use hyperlinks
 \usepackage[pdftex]{hyperref}				
@@ -52,7 +51,5 @@
 \pagenumbering{arabic}
 \input{ThermalSoftware.tex}
 \clearpage
-\renewcommand{\bibsection}{\section{References}}
-\bibliographystyle{ametsoc} 
-\bibliography{research}
+
 \end{document}

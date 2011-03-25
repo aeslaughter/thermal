@@ -36,7 +36,7 @@ function fig = model
         set(h.list,'uicontextmenu',hmenu);
         
     % 2.5 - Callbacks for plot buttons
-        hh = [h.contour,h.profile,h.ciprofile,h.cicontour,h.input];
+        hh = [h.contour,h.profile,h.ciprofile,h.cicontour];
         set(hh,'Callback',{@callback_plotbtn});
    
  % 3 - INITILIZE
@@ -53,31 +53,13 @@ function fig = model
     
  % 4 - VERSION INFORMATION
     GUI = guidata(fig);
-    GUI.version = 0.1;
-    GUI.verdate = 'Mar. 22, 2010';
+    GUI.version = 0.2;
+    GUI.verdate = 'Mar. 25, 2011';
     setpref('thermalmodel','version',GUI.version);
     guidata(fig,GUI);
- 
- % 5 - PROMPT USER OF NEW VERSION
-    try
-        available = urlread(['http://www.coe.montana.edu/',...
-                    'ce/subzero/snow/thermalmodel/version.txt']);
-        available = str2double(available);
-    catch
-        available = 0;
-    end
-    if available > getpref('thermalmodel','version');
-       q = ['A new version is available, would you like to download',...
-           ' the new file?'];
-       ans = questdlg(q,'New version?','Yes','No','Yes');
-       if strcmpi(ans,'yes');
-            web http://www.coe.montana.edu/ce/subzero/snow/thermalmodel/...
-                -browser
-       end
-    end
-       
+        
 %--------------------------------------------------------------------------
-function callback_graph(hObject,eventdata)
+function callback_graph(hObject,~)
 % CALLBACK_GRAPH creates the desired graph via result.m   
   
 % 1 - GATHER INFORMATION FROM GUI
@@ -95,8 +77,16 @@ function callback_graph(hObject,eventdata)
     
 % 2 - SNOW DATA
     snw = get(h.snw,'Value'); idx = snw ~= 1; snw = snw(idx);
+    n = ndims(data.snw);
     for i = 1:length(snw); 
-        results('snw',data,snw(i),ci); title(data.name);  
+        if profile == 1 && n == 3;
+            disp('snow profiles')
+            %results('snwprofiles',data,snw(i),Tint); title(data.name);  
+        elseif profile == 0 && n == 3;
+            results('snwcontour',data,snw(i),ci); title(data.name); 
+        else
+            results('snw',data,snw(i),ci); title(data.name); 
+        end
     end
     
 % 3 - ATMOSPHERIC DATA
@@ -107,9 +97,9 @@ function callback_graph(hObject,eventdata)
     flx = get(h.flux,'Value'); idx = flx ~= 1; flx = flx(idx)-1;
     for i = 1:length(flx); 
         if profile == 1
-            results('flux',data,flx(i),Tint,ci);;
+            results('flux',data,flx(i),Tint,ci);
         elseif profile == 0;
-            results('fluxcontour',data,flx(i),ci);;
+            results('fluxcontour',data,flx(i),ci);
         end
     end
     
@@ -118,14 +108,14 @@ function callback_graph(hObject,eventdata)
     opt = {'T','TG'};
     for i = 1:length(tmp); 
         if profile == 1
-            results(opt{tmp(i)},data,Tint,ci);;
+            results(opt{tmp(i)},data,Tint,ci);
         elseif profile == 0;
-            results([opt{tmp(i)},'contour'],data,ci);;
+            results([opt{tmp(i)},'contour'],data,ci);
         end
     end
     
 %--------------------------------------------------------------------------
-function callback_newproject(hObject,eventdata)
+function callback_newproject(hObject,~)
 % CALLBACK_NEWPROJECT creates a new project
   
 % 1 - CHECK THAT PROJECT IS SAVED
@@ -180,7 +170,7 @@ function callback_newproject(hObject,eventdata)
         callback_newrun(h.newrun,[]);
     
 %--------------------------------------------------------------------------
-function callback_changebase(hObject,eventdata)
+function callback_changebase(hObject,~)
 % CALLBACK_CHANGEBASE opens dialog for changing base xls file
 
 % 1 - Determine new Excel file
@@ -229,7 +219,7 @@ function callback_openproject(hObject,eventdata)
     callback_selectproject(h.list,[]);
 
 %--------------------------------------------------------------------------
-function callback_selectproject(hObject,eventdata)
+function callback_selectproject(hObject,~)
 % CALLBACK_SELECTPROJECT executes when a run is selected from the project
     
 % 1 - Insert text
@@ -274,7 +264,7 @@ function callback_selectproject(hObject,eventdata)
     end
 
 %--------------------------------------------------------------------------
-function callback_evaluate(hObject,eventdata)
+function callback_evaluate(hObject,~)
 % CALLBACK_EVALUATE peforms the model evalution and add to run list
 
  % 1 - Gather GUI information
@@ -323,7 +313,7 @@ function callback_evaluate(hObject,eventdata)
     callback_selectproject(h.list,[]);
      
 %--------------------------------------------------------------------------
-function callback_newrun(hObject,eventdata)
+function callback_newrun(hObject,~)
 % CALLBACK_NEWRUN allows user to execute the thermal model
 
 % 1 - Gather information from GUI 
@@ -345,7 +335,7 @@ function callback_newrun(hObject,eventdata)
     set(h.desc,'String','');
 
 %--------------------------------------------------------------------------
-function callback_deleterun(hObject,eventdata)
+function callback_deleterun(hObject,~)
 % CALLBACK_DELETERUN removes the current selection
 
 % 1 - Gather information from the GUI
@@ -368,7 +358,7 @@ function callback_deleterun(hObject,eventdata)
     callback_selectproject(h.list,[]);
     
 %--------------------------------------------------------------------------
-function callback_editname(hObject,eventdata)
+function callback_editname(hObject,~)
 % CALLBACK_EDITNAME allows the run name to be changed
 
 % 1 - Gather information from the GUI and exit if no data exists
@@ -393,7 +383,7 @@ function callback_editname(hObject,eventdata)
     callback_selectproject(h.list,[]);
 
 %--------------------------------------------------------------------------
-function callback_saveproject(hObject,eventdata)
+function callback_saveproject(hObject,~)
 % CALLBACK_SAVEPROJECT saves the current project
 
 % 1 - Gather data from GUI
@@ -471,7 +461,7 @@ function [S,A,F,T] = getlists
     T{3} = 'Temperature gradient';
     
 %--------------------------------------------------------------------------
-function callback_closerequestfcn(hObject,eventdata)
+function callback_closerequestfcn(hObject,~)
 % CALLBACK_CLOSEREQUESTFCN operates when the main window closes
 
 % 1 - Compare the saved project with the current project
@@ -494,7 +484,7 @@ function callback_closerequestfcn(hObject,eventdata)
     delete(gcbf);
     
 %--------------------------------------------------------------------------
-function callback_toggleci(hObject,eventdata)
+function callback_toggleci(hObject,~)
 % CALLBACK_TOGGLECI toggles the visibility of confidence interval items
 
 vis = 'off';
@@ -504,31 +494,29 @@ h = guihandles(hObject);
 set(get(h.cipanel,'Children'),'Enable',vis);
 
 %--------------------------------------------------------------------------
-function callback_plotbtn(hObject,eventdata)
+function callback_plotbtn(hObject,~)
 % CALLBACK_PLOTBTN sets approiate enable actions when a plot button is hit
-
 h = guihandles(hObject);
-hh = [h.Tint,h.Tint_text; h.cilevel, h.cilevel_text; ...
-    h.citime, h.citime_text; h.snw, h.snw_text; ...
-    h.atm, h.atm_text; h.flux, h.flux_text; h.temp, h.temp_text];
+hh = [h.Tint,h.Tint_text; h.cilevel, h.cilevel_text;...
+    h.citime, h.citime_text;];
 set(hh,'Enable','on');
 
-if get(h.input,'Value') == 1; 
-    set(hh([1:3,6,7],:),'enable','off');
-elseif get(h.contour,'Value') == 1; 
-    set(hh(1:5,:),'enable','off'); 
+if get(h.contour,'Value') == 1; 
+    set(hh(1:3,:),'enable','off'); 
 elseif get(h.profile,'Value') == 1; 
-    set(hh(2:5,:),'enable','off');
+    set(hh(2:3,:),'enable','off');
 elseif get(h.ciprofile,'Value') == 1; 
-    set(hh([1,6],:),'enable','off');
+    set(hh(1,:),'enable','off');
 elseif get(h.cicontour,'Value') == 1; 
-    set(hh([1,3:6],:),'enable','off');
+    set(hh(1,:),'enable','off');
 end
+
+callback_toggleci(h.compci,[]);
 
 %--------------------------------------------------------------------------
 % CALLBACKS: help/abouts
-function help(hObject,eventdata,gui); winopen('documentation\help.pdf');
-function about(hObject,eventdata)
+function help(~,~); winopen('documentation\help.pdf');
+function about(hObject,~)
    GUI = guidata(hObject);
    m{1} = ['This program was created by Andrew E. Slaughter and ',...
        'cannot be used without expressed permission.'];

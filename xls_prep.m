@@ -33,8 +33,8 @@ function out = fill_array(in,int)
 % 1 - Build array for case when data is only a single row (constant data)
     len = size(in,1);
     if len == 1;
-        in(2,:) = in(1,:);
-        in(1,1) = 0;
+        in(2,:,:) = in(1,:,:);
+        in(1,1,:) = 0;
     end
 
 % 2 - Build new array with spacing based on "int"
@@ -43,7 +43,10 @@ function out = fill_array(in,int)
         xi = (in(1,1):int:in(n,1))';
 
     % 2.2 - Interpolate the remaining data based on the first column
-        x = in(:,1);
-        Y = in(:,2:size(in,2));
-        yi = interp1(x,Y,xi,'linear');
-        out = [xi,yi];
+        for i = 1:size(in,3);
+            x = in(:,1,i);
+            Y = in(:,2:size(in,2),i);
+            yi = interp1(x,Y,xi,'linear');
+            out(:,:,i) = [xi,yi];
+        end
+

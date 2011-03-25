@@ -9,12 +9,12 @@ function data = confint(filename,B,n)
     T = thermal(Sa,Aa,C);
 
 % Compute the standard deviation values    
-    s = getstd(S,E.snow,n,1); % standard devaition for snow properties 
-    a = getstd(A,E.atm,n,1); % standard devaition for atmospheric terms 
+    s = getstd(S,E.snow,n,1);  % standard devaition for snow properties 
+    a = getstd(A,E.atm,n,1);   % standard devaition for atmospheric terms 
     c = getstd(C,E.const,n,0); % standard deviation for constants
     
 % Compute the Monte Carlo replicates    
-    data.Tboot = zeros([size(T),B]); % Initilize storage array
+    data.Tboot = single(zeros([size(T),B])); % Initilize storage array
     h = waitbar(0,'Please wait...');
     for i = 1:B;
         r = rand(1);     
@@ -31,9 +31,13 @@ function data = confint(filename,B,n)
   
         [SS,AA] = xls_prep(S_b,A_b,C_b); % Build input for evaluation
         [data.Tboot(:,:,i), data.Qboot(:,:,:,i)] = thermal(SS,AA,C_b);
-        data.Sboot(:,:,i) = SS;
-        data.Aboot(:,:,i) = AA;
-        data.Cboot(:,:,i) = C_b;
+        if ndims(S) == 3;
+            data.Sboot(:,:,:,i) = single(SS);
+        else
+            data.Sboot(:,:,i) = single(SS);
+        end
+        data.Aboot(:,:,i) = single(AA);
+        data.Cboot(:,:,i) = single(C_b);
         waitbar(i/B,h);
     end
     close(h);
@@ -42,13 +46,13 @@ function data = confint(filename,B,n)
 function s = getstd(S,E,n,offset)
 % GETSTD returns the standard deviation of the input items
     if offset == 1;
-        s(:,1) = S(:,1);
+        s(:,1,:) = S(:,1,:);
         for i = 2:size(S,2);
-            s(:,i) = S(:,i).*E(i-offset)/n;
+            s(:,i,:) = S(:,i,:).*E(i-offset)/n;
         end
     elseif offset == 0;
         for i = 1:size(S,2);
-            s(:,i) = S(:,i).*E(i)/n;
+            s(:,i,:) = S(:,i,:).*E(i)/n;
         end    
     end
 
