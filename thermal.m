@@ -56,10 +56,10 @@ function [T,Q] = thermal(snow,atm,C)
         T(ns+1,:) = atm(:,8); % Base
 
     % 2.2 - General Matrix coefficients
-        Ca = snow(:,3) ./ dz^2;                 % a
-        Cb = (snow(:,2) .* snow(:,4))./dt;      % b
-        Cc = Cb + Ca;                           % c
-        Cd = Cb - Ca;                           % d  
+        Ca = squeeze(snow(:,3,:) ./ dz^2);                  % a
+        Cb = squeeze((snow(:,2,:) .* snow(:,4,:))./dt);     % b
+        Cc = Cb + Ca;                                       % c
+        Cd = Cb - Ca;                                       % d  
 
 % 3 - BEGIN COMPUTING FOR EACH TIME STEP (time step = index "j")        
 for j = 2:nt     
@@ -98,20 +98,20 @@ for j = 2:nt
             end
             
             % Solution matrices
-            A(i,i-1) = -Ca(i)/2;
-            A(i,i)   = Cc(i);
-            A(i,i+1) = -Ca(i)/2;
-            b(i,1) = Ca(i)/2*T(i-1,j-1) + Cd(i)*T(i,j-1) + ...
-                        Ca(i)/2*T(i+1,j-1) + sum(q(i,j,:))/dz;
+            A(i,i-1) = -Ca(i,j)/2;
+            A(i,i)   = Cc(i,j);
+            A(i,i+1) = -Ca(i,j)/2;
+            b(i,1) = Ca(i,j)/2*T(i-1,j-1) + Cd(i,j)*T(i,j-1) + ...
+                        Ca(i,j)/2*T(i+1,j-1) + sum(q(i,j,:))/dz;
         end
         
     % 3.6 - Compute the surface flux
         sur_flux = sum(qs(j,1:3));
  
     % 3.7 - Insert matrix values for surface node (i = 1)
-        A(1,1) = Cc(1);
-        A(1,2) = -Ca(1);
-        b(1) = Cd(1)*T(1,j-1) + Ca(1)*T(2,j-1) + 2*sur_flux/dz + ...
+        A(1,1) = Cc(1,j);
+        A(1,2) = -Ca(1,j);
+        b(1) = Cd(1,j)*T(1,j-1) + Ca(1,j)*T(2,j-1) + 2*sur_flux/dz + ...
             sum(q(1,j,:))/dz;
 
     % 3.8 - Insert matrix values for bottom boundary condition

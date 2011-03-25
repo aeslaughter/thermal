@@ -3,6 +3,7 @@ function results(type,data,varargin)
 %__________________________________________________________________________
 % SYNTAX:
 %   results('snw',data,N);
+%   results('snwcontour',data,N);
 %   results('atm',data,N);
 %   results('T',data,Tint);
 %   results('TG',data,Tint);
@@ -33,7 +34,6 @@ function results(type,data,varargin)
 
 % 1 - GATHER THE X & Y DATA AND PLOT SETTINGS (a)
 switch lower(type)
-    % Snow properties
     case 'snw'; 
         N = varargin{1};
         y = data.snw(:,1); x = data.snw(:,N);
@@ -47,7 +47,10 @@ switch lower(type)
                 [num2str(100-lvl),'\% C.I.']};
         end
         
-    % Atmospheric conditions
+    case 'snwcontour'
+        [x,y,a] = snwcontour(data,varargin{:});
+    case 'snwprofile'
+        [x,y,a] = snwprofile(data,varargin{:});
     case 'atm'; 
         N = varargin{1};
         x = data.atm(:,1)/3600; y = data.atm(:,N);
@@ -75,7 +78,8 @@ end
 % 2 - PRODUCE GRAPH
     if isempty(x); return; end
     a.name = data.name;
-    XYscatter(x,y,'advanced',a,'interpreter','latex','prompt','off');
+    XYscatter(x,y,'advanced',a,'interpreter','latex','prompt','off',...
+        'tight','off');
        
 %--------------------------------------------------------------------------
 function [X,Y] = getlabel(type,N)
@@ -85,8 +89,8 @@ switch lower(type)
     case 'snw';
         x{1} = 'Depth ($cm$)';
         x{2} = 'Density, $\rho$ ($kg/m^3$)';
-        x{3} = 'Thermal conductivity, $k$ ($W/(m^{circ}K)$)';
-        x{4} = 'Specific heat, $C_p$ ($kJ/(kg^{\circ}K)$)';
+        x{3} = 'Thermal conductivity, $k$ ($W/(m\cdot K)$)';
+        x{4} = 'Specific heat, $C_p$ ($kJ/(kg\cdot K)$)';
         x{5} = 'Initial snow temp., $T_s^{initial}$ ($^{\circ}C$)';
         x{6} = 'Extinction coefficient, $\kappa$ ($m^{-1}$)';
         x{7} = 'Extinction coefficient, $\kappa_{NIR}$ ($m^{-1}$)';
@@ -213,7 +217,52 @@ function [x,y,a] = tempcontour(type,data,varargin)
         a.contourxunits = 1/dt;
         a.colorbarlabel = 'Max deviation ($^{\circ}C$)';
     end
-        
+    
+%--------------------------------------------------------------------------
+function [x,y,a] = snwcontour(data,varargin)
+% TEMPCONTOUR builds contour plots of snow data w/r/t time
+
+% 1 - Build X & Y data
+    N = varargin{1};
+    x = squeeze(data.snw(:,N,:));
+    a.colorbarlabel = getlabel('snw',N);  
+    C = data.const; dt = C(10); dz = C(9);
+    y = 50; % No. of contours 
+          
+% 2 - Define plot settings
+    a.xlabel = 'Time ($hr$)';
+    a.ylabel = 'Depth ($cm$)';
+    a.ydir = 'reverse';
+    a.contourxunits = dt/3600;
+    a.contouryunits = dz;
+    a.colormap = 'jet';
+    a.contour = 'on';
+    a.colorbar = 'on';
+    a.ylim = [0,(size(data.T,1)-1)*dz];
+    a.xlim = [0,(size(data.T,2)-1)*dt/3600];
+    
+%--------------------------------------------------------------------------
+function [x,y,a] = snwprofile(data,varargin)
+% TEMPPLOT builds snow profiles w/r/t time
+
+% 1 - Build X and Y data
+    N = varargin{1};
+    Tint = varargin{2};
+    C = data.const; dt = C(10); dz = C(9);
+    y = (0:dz:size(data.T,1)*dz)';
+    x = squeeze(data.snw(:,N,:));
+    
+    t = 1:Tint*3600/dt:size(data.T,2);
+    for i = 1:length(t); 
+        a.legend{i} = datestr((i-1)*varargin{1}/24,'HH:MM'); 
+    end  
+    x = x(:,t); 
+
+% 2 - Set graph settings    
+    a.xlabel = getlabel('snw',N);
+    a.ylabel = 'Depth ($cm$)';
+    a.ydir = 'reverse';
+    
 %--------------------------------------------------------------------------
 function [x,y,a] = fluxplot(data,varargin)
 % FLUXPLOT plots flux profiles or surface value w/r/t to time

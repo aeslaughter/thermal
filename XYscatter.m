@@ -519,7 +519,7 @@ case {'size'}
 % 17 - SET THE AXIS TO FIT TIGHT
 case {'tight'}
     % 17.1 - Check that status is on (case when intilizing figure)
-        if trig == 1 && strcmpi(a.tight,'off'); end
+        if trig == 1 && strcmpi(a.tight,'off'); return; end
 
     % 17.2 - Toggle off any text interpretation
         h1 = findobj(gcf,'-property','Interpreter');
